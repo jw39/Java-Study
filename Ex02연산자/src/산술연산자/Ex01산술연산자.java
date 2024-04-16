@@ -24,6 +24,8 @@ public class Ex01산술연산자 {
 		System.out.println(num3 + num4);
 		// 문자 + 숫자 ---> 연결의 의미
 		// 문자 + 숫자 = 문자 자료형
+		
+		//커밋 위한 테스트임다~~
 
 	
 		
