@@ -7,11 +7,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 public class Ex02회원관리 {
 
 	public static void main(String[] args) {
+		// 디자인 패턴
+
 		DAO dao = new DAO();
+
 		Scanner sc = new Scanner(System.in);
 
 		while (true) {
@@ -33,12 +35,12 @@ public class Ex02회원관리 {
 					// 2. 로그인 쿼리문 실행
 					// select name from datamember where id = ? and pw = ?
 					// 000님 환영합니다
-					
+
 					String name = dao.loginUser(inputId, inputPw);
 					// name == "" : 로그인 실패
 					// name != "" : 로그인 성공
-					
-					if(name.equals("")) {
+
+					if (name.equals("")) {
 						System.out.println("로그인 실패 ㅠㅠ");
 					} else {
 						System.out.println("로그인 성공 !!");
@@ -83,9 +85,16 @@ public class Ex02회원관리 {
 				}
 
 			} else if (menu == 3) {
+
 				// 회원 전체 조회
-//				ArrayList<Member> m = new ArrayList<Member>();
-//				System.out.println(m);
+				// 1. DAO가 가지고 있는 searchMember 사용하기
+				// 2. 결과값을 출력하기
+				ArrayList<DTO> resultList = dao.searchMember();
+				System.out.println("아이디\t이름\t나이");
+				for (DTO d : resultList) {
+					System.out.print(d.getId() + "\t" + d.getName() + "\t" + d.getAge());
+					System.out.println();
+				}
 
 			} else if (menu == 4) {
 
@@ -136,7 +145,7 @@ public class Ex02회원관리 {
 				} catch (Exception e) {
 					e.printStackTrace();
 
-				// 3. 연결정보 닫아주기
+					// 3. 연결정보 닫아주기
 				} finally {
 					dao.dbClose();
 				}

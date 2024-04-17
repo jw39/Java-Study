@@ -30,7 +30,6 @@ public class DAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	// DB랑 연결되는 통로와 수레 닫기
@@ -48,15 +47,15 @@ public class DAO {
 	}
 
 	// [1]로그인, 로그인 기능
-	public String loginUser (String inputId, String inputPw) {
+	public String loginUser(String inputId, String inputPw) {
 		String sql = "select age, name from datamember where id = ? and pw = ?";
 
 		// executeQuery()의 결과를 rs에 담기 위해 초기화 시켜줌
 		ResultSet rs = null;
 		// ResultSet은 executeQuery()의 반환 타입임
-		
-		String name = "";	// 리턴값 초기화
-		
+
+		String name = ""; // 리턴값 초기화
+
 		try {
 			psmt = conn.prepareStatement(sql);
 			psmt.setString(1, inputId);
@@ -68,7 +67,7 @@ public class DAO {
 
 			// 1. 테이블 말고 데이터만 가져오기 위한 작업!!
 			// ★★★★★★ rs.next() : 다음 행에 데이터가 있는지 확인하는 기능! ★★★★★★
-			if (rs.next()) {	// 다음 행에 데이터가 있으면 true로 조건 만족
+			if (rs.next()) { // 다음 행에 데이터가 있으면 true로 조건 만족
 				name = rs.getString(2);
 				// rs.getString(1) : 결과 데이터 중 첫번째 컬럼에 있는 데이터를 문자열로 받아오겠습니다
 				// 괄호 안의 숫자는 string 타입의 몇 번째 컬럼의 데이터를 가져오겠다
@@ -77,15 +76,14 @@ public class DAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
 		return name;
-
 	}
 
 	// [2]회원가입 , 회원 가입 기능
 	public int insertUser(String id, String pw, String name, int age) {
 
 		String sql = "INSERT INTO DATAMEMBER VALUES(?, ?, ?, ?)";
+		
 		int row = 0;
 
 		try {
@@ -101,45 +99,55 @@ public class DAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		return row;
-
 	}
-	
-	
+
 	// [3]회원 전체조회, 전체 회원 조회
-	public void searchMember() {
+	// DTO를 담고 있는 어레이 리스트를 리턴하겠다
+	public ArrayList<DTO> searchMember() {
 
 		String sql = "select * from datamember";
-		ResultSet rs = null; // ResultSet: select 절을 통한 테이블 형식 데이터를 받아올 수 있는 타입
 		
+		ResultSet rs = null; // ResultSet: select 절을 통한 테이블 형식 데이터를 받아올 수 있는 타입
+
 		// 사용자 정보 전부 EX02 회원관리로 넘기기
 		// 힌트 1. arrayList 사용
 		// 힌트 2. id, pw, name, age를 다룰 수 있는 class 생성
 
+		// 레퍼런스 타입이라 null로 초기화한다. 글고 지역변수라 전역변수로 선언해준 거임
+		DTO dto = null;
+		// DTO를 담아줄 ArrayList 생성
+		ArrayList<DTO> list = new ArrayList<DTO>();
+
 		// 쿼리문 실행
 		try {
+			// 메인 말고 try 안에서 conn 연결한다
+			conn();
+			// sql문 psmt 수레로 가져오겠다!
 			psmt = conn.prepareCall(sql);
 			rs = psmt.executeQuery();
 
-			
 			while (rs.next()) {
 				String id = rs.getString(1);
 				String pw = rs.getString(2);
 				String name = rs.getString(3);
 				int age = rs.getInt(4);
 
-				System.out.println("ID: " + id + "PW: " + pw + "NAME: " + name + "AGE: " + age);
+				// DTO 만들었으니께 DTO 객체 생성
+				// 조회해온 결과 (rs)에 담겨있는 데이터를 DTO에 옮겨서 하나로 묶어줌
+				dto = new DTO(id, pw, name, age);
+				// ArratList 이용해서 모든 회원 하나로 묶어주는 작업, list에 sql문 결과를 담아줬다
+				list.add(dto);
 			}
-			
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			dbClose();
 		}
+		// 사람 데이터를 담은 dto를 담은 list를 바꿔줄 거야~~
+		return list;
 	}
 
-	
-	
 	// [4]회원 정보수정, 회원 정보 수정
 	public int updateUser(String inputName, String inputId) {
 
@@ -163,7 +171,6 @@ public class DAO {
 
 	}
 
-	
 	// [5]회원삭제, 삭제 기능
 	public int deleteUser(String inputId) {
 		String sql = "delete from datamember where id = ?";
